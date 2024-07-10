@@ -302,6 +302,10 @@ class SpatialBase(object):
     @abc.abstractproperty
     def flux(self):
         raise NotImplementedError
+    
+    @abc.abstractproperty
+    def flux_new(self):
+        raise NotImplementedError    
 
     @abc.abstractproperty
     def x_cen(self):
@@ -453,6 +457,13 @@ class PPVStatistic(SpatialBase):
                             velocity_scale=self.velocity_scale,
                             beam_major=self.beam_major,
                             beam_minor=self.beam_minor)
+    
+    @property
+    def flux_new(self):
+        """
+        Returns flux without unit conversion, returning self.stat.mom0
+        """
+        return self.stat.mom0()
 
     @property
     def v_rms(self):
@@ -529,6 +540,13 @@ class PPStatistic(SpatialBase):
                             spatial_scale=self.spatial_scale,
                             beam_major=self.beam_major,
                             beam_minor=self.beam_minor)
+    
+    @property
+    def flux_new(self):
+        """
+        Returns flux without unit conversion, returning self.stat.mom0
+        """
+        return self.stat.mom0()
 
     @property
     def position_angle(self):
@@ -717,7 +735,7 @@ def ppv_catalog(structures, metadata, fields=None, verbose=True):
         The resulting catalog
     """
     fields = fields or ['major_sigma', 'minor_sigma', 'radius', 'area_ellipse', 'area_exact',
-                        'position_angle', 'v_rms', 'x_cen', 'y_cen', 'v_cen', 'flux']
+                        'position_angle', 'v_rms', 'x_cen', 'y_cen', 'v_cen', 'flux', 'flux_new']
 
     with warnings.catch_warnings():
         warnings.simplefilter("once" if verbose else 'ignore', category=MissingMetadataWarning)
@@ -749,7 +767,7 @@ def pp_catalog(structures, metadata, fields=None, verbose=True):
         The resulting catalog
     """
     fields = fields or ['major_sigma', 'minor_sigma', 'radius', 'area_ellipse', 'area_exact',
-                        'position_angle', 'x_cen', 'y_cen', 'flux']
+                        'position_angle', 'x_cen', 'y_cen', 'flux', 'flux_new']
     with warnings.catch_warnings():
         warnings.simplefilter("once" if verbose else 'ignore', category=MissingMetadataWarning)
         return _make_catalog(structures, fields, metadata, PPStatistic, verbose)
